@@ -1,0 +1,71 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# --- 1. Definir los Parámetros del Caso JETLAG y Mercado ---
+rf = 0.054  # Tasa Libre de Riesgo (5.4%)
+premio_mercado = 0.07 # Premio por Riesgo del Mercado (7%)
+
+# Parámetros del Mercado
+retorno_mercado = rf + premio_mercado # 12.4%
+desv_estandar_mercado = 0.10 # 10%
+
+# Parámetros de JETLAG
+retorno_esperado_jetlag = 0.11 # 11%
+desv_estandar_jetlag = 0.18 # 18%
+
+# --- 2. Simular la Frontera Eficiente (la curva que te pasaron) ---
+# Como no tenemos los datos de todos los activos, simulamos una curva plausible.
+# Esta parte es solo para la visualización.
+y = np.linspace(0.08, 0.16, 100)
+x = ( (y - 0.10)**2 / 0.8 ) + 0.08
+x_ineficiente = x[::-1] # Parte inferior de la curva
+y_ineficiente = y[::-1]
+
+# --- 3. Calcular la Línea de Mercado de Capitales (CML) ---
+# La CML es una línea recta que une (0, Rf) y (sigma_mercado, E(Rm))
+sigma_cml = np.linspace(0, 0.25, 100)
+retorno_cml = rf + (retorno_mercado - rf) / desv_estandar_mercado * sigma_cml
+
+# --- 4. Crear el Gráfico ---
+plt.style.use('seaborn-v0_8-whitegrid')
+fig, ax = plt.subplots(figsize=(12, 8))
+
+# Dibujar la Frontera Eficiente (la curva que te dieron)
+ax.plot(x, y, color='darkgreen', linestyle='--', label='Frontera Eficiente')
+ax.plot(x_ineficiente, y_ineficiente, color='darkgreen', linestyle=':')
+
+# Dibujar la Línea de Mercado de Capitales (CML)
+ax.plot(sigma_cml, retorno_cml, color='royalblue', linewidth=2, label='Línea de Mercado de Capitales (CML)')
+
+# Dibujar los puntos clave
+ax.scatter(0, rf, color='green', s=100, zorder=5, label=f'Activo Libre de Riesgo ({rf:.1%})')
+ax.scatter(desv_estandar_mercado, retorno_mercado, color='darkorange', s=150, zorder=5, label=f'Portafolio de Mercado ({retorno_mercado:.1%})')
+ax.scatter(desv_estandar_jetlag, retorno_esperado_jetlag, color='red', marker='X', s=150, zorder=5, label=f'JETLAG ({retorno_esperado_jetlag:.1%})')
+
+# --- 5. Añadir Anotaciones y Etiquetas ---
+ax.text(desv_estandar_jetlag + 0.005, retorno_esperado_jetlag, 'JETLAG', color='red', weight='bold')
+ax.text(desv_estandar_mercado + 0.005, retorno_mercado, 'Portafolio de Mercado', color='darkorange', weight='bold')
+
+# Marcar la zona ineficiente
+ax.text(0.15, 0.09, 'Zona de Portafolios\nIneficientes', ha='center', style='italic', color='gray')
+
+
+# Etiquetas de los ejes y título
+ax.set_xlabel('Riesgo Total (σ - Desviación Estándar)', fontsize=12)
+ax.set_ylabel('Retorno Esperado E(R)', fontsize=12)
+ax.set_title('Frontera Eficiente, CML y Posición de JETLAG', fontsize=16, weight='bold')
+
+# Formatear ejes como porcentajes
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0%}'))
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.1%}'))
+ax.tick_params(axis='both', which='major', labelsize=10)
+
+# Añadir leyenda
+ax.legend(fontsize=11)
+
+# Ajustar límites de los ejes para mejor visualización
+ax.set_xlim(0, 0.25)
+ax.set_ylim(0.04, 0.18)
+
+plt.tight_layout()
+plt.show()
