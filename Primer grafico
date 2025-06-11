@@ -1,0 +1,30 @@
+# Dibujar la Línea de Mercado de Valores (SML)
+ax.plot(betas, sml_line, color='royalblue', linewidth=2, label='Línea de Mercado de Valores (SML)')
+
+# Dibujar los puntos clave
+ax.scatter(0, rf, color='green', s=100, zorder=5, label=f'Activo Libre de Riesgo ({rf:.1%})')
+ax.scatter(1, retorno_mercado, color='darkorange', s=100, zorder=5, label=f'Portafolio de Mercado ({retorno_mercado:.1%})')
+ax.scatter(beta_jetlag, retorno_esperado_jetlag, color='red', marker='X', s=150, zorder=5, label=f'JETLAG (Esperado: {retorno_esperado_jetlag:.1%}) - SOBREVALORADA')
+ax.scatter(beta_jetlag, retorno_requerido_jetlag, color='black', s=100, zorder=5, label=f'JETLAG (Requerido: {retorno_requerido_jetlag:.2%})')
+
+# --- 5. Añadir Anotaciones y Etiquetas para Claridad ---
+# Línea punteada para mostrar el Alfa Negativo
+ax.plot([beta_jetlag, beta_jetlag], [retorno_esperado_jetlag, retorno_requerido_jetlag], 'k--', linewidth=1)
+# Texto del Alfa
+ax.text(beta_jetlag + 0.02, (retorno_esperado_jetlag + retorno_requerido_jetlag)/2, 'Alfa < 0', verticalalignment='center', color='red', weight='bold')
+
+# Etiquetas de los ejes y título
+ax.set_xlabel('Beta (β) - Riesgo Sistemático', fontsize=12)
+ax.set_ylabel('Retorno Esperado E(R)', fontsize=12)
+ax.set_title('Análisis CAPM: Evaluación de la Acción JETLAG', fontsize=16, weight='bold')
+
+# Formatear el eje Y para mostrar porcentajes
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.1%}'))
+ax.tick_params(axis='both', which='major', labelsize=10)
+
+# Añadir leyenda
+ax.legend(fontsize=11)
+
+# Ajustar layout y mostrar el gráfico
+plt.tight_layout()
+plt.show()
